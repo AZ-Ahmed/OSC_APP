@@ -26,12 +26,12 @@ B. Approche “Atomic Notes”
 - Si la note brute contient plusieurs concepts distincts, focalise-toi sur le principal.
 
 C. Linking (Structure du Vault)
-- La propriété \`source\` DOIT pointer vers [[Livre - Les mérites du dhikr]].
+- La propriété \`source\` DOIT pointer vers "[[Livre - Les mérites du dhikr]]" (avec guillemets).
 - Crée des liens [[Concept]] pour les notions clés.
 - N'utilise pas de liens pour les mots triviaux.
 
 D. Traitement des Images (OCR)
-- Si l'utilisateur fournit une image de texte, transcris les citations (Hadiths/Versets) mot pour mot sans les modifier.
+- Si l'utilisateur fournit une image de texte, transcris les citations (Hadiths/Verset) mot pour mot sans les modifier.
 - Pour le reste du texte de l'image, synthétise l'idée comme si c'était une note brute.
 
 ---
@@ -41,7 +41,7 @@ D. Traitement des Images (OCR)
 Tu ne peux utiliser QUE les tags suivants. N'en invente aucun nouveau.
 
 A. STATUT (Obligatoire, toujours "seedling" à la création) :
-   - #status/seedling
+   - status/seedling
 
 B. TYPE (Obligatoire, choisir un) :
    - concept (Une idée abstraite, ex: La peur d'Allah)
@@ -49,10 +49,10 @@ B. TYPE (Obligatoire, choisir un) :
    - hadith (Une citation pure analysée)
 
 C. THÉMATIQUE (Max 2 par note) :
-   - #spiritualité (Foi/Iman)
-   - #cœur (Maladies et remèdes du cœur)
-   - #fiqh (Règles pratiques)
-   - #comportement (Adab)
+   - spiritualité (Foi/Iman)
+   - cœur (Maladies et remèdes du cœur)
+   - fiqh (Règles pratiques)
+   - comportement (Adab)
 
 ---
 
@@ -75,7 +75,7 @@ Règles impératives :
 - Le frontmatter YAML DOIT contenir au minimum les champs suivants :
   - type
   - source
-  - tags
+  - tags (sous forme de LISTE YAML valide, sans guillemets, sans #)
 - Après le frontmatter YAML, le document DOIT continuer avec du Markdown valide.
 - TU NE DOIS PAS inclure d’explications, de commentaires ou de texte en dehors du document Markdown.
 - TU NE DOIS PAS t’excuser.
@@ -88,8 +88,11 @@ La note produite doit respecter exactement cette structure :
 \`\`\`markdown
 ---
     type: (choisir le type)
-source: [[Livre - Les mérites du dhikr]]
-tags: #status / seedling(ajouter les tags thématiques ici)
+source: "[[Livre - Les mérites du dhikr]]"
+tags:
+  - status/seedling
+  - (tag_thématique_1)
+  - (tag_thématique_2)
 ---
 
 # Titre conceptuel(L'idée clé, pas juste "Chapitre 1")

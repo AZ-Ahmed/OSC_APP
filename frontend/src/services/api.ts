@@ -27,15 +27,18 @@ export const api = {
 
         const data = await response.json();
 
-        if (!response.ok || data.success !== true) {
-            throw new Error(data.error || 'Capture failed');
+        if (!response.ok || data.status !== 'success') {
+            console.error('Capture API interaction failed:', { status: response.status, data });
+            // Fallback to data.error if data.message is missing (legacy backend support)
+            throw new Error(data.message || data.error || `Capture failed with status: ${response.status}`);
         }
 
-        // Adaptation backend → frontend response shape
+        // Return the actual response from the backend
         return {
-            id: crypto.randomUUID(), // backend n’envoie pas d’id → on en génère un
+            id: data.id,
             status: 'success',
-            obsidianFile: data.filename,
+            obsidianFile: data.obsidianFile,
+            markdown: data.markdown,
             message: 'Capture processed successfully',
         };
     },

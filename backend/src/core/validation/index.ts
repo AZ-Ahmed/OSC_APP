@@ -31,7 +31,7 @@
 /**
  * Allowed status tags
  */
-const STATUS_TAGS = ['#status/seedling'] as const;
+const STATUS_TAGS = ['status/seedling'] as const;
 
 /**
  * Allowed type values (not tags, just YAML field values)
@@ -42,10 +42,10 @@ const ALLOWED_TYPES = ['concept', 'action', 'hadith'] as const;
  * Allowed thematic tags
  */
 const THEMATIC_TAGS = [
-    '#spiritualité',
-    '#cœur',
-    '#fiqh',
-    '#comportement',
+    'spiritualité',
+    'cœur',
+    'fiqh',
+    'comportement',
 ] as const;
 
 /**
@@ -167,7 +167,14 @@ export function parseFrontmatter(yaml: string): Record<string, unknown> {
                 currentArray = [];
             } else {
                 // Simple string value
-                result[currentKey] = value;
+                if (
+                    (value.startsWith('"') && value.endsWith('"')) ||
+                    (value.startsWith("'") && value.endsWith("'"))
+                ) {
+                    result[currentKey] = value.slice(1, -1);
+                } else {
+                    result[currentKey] = value;
+                }
                 currentArray = null;
             }
             continue;
@@ -238,10 +245,17 @@ export function validateTags(tags: unknown): void {
     let tagArray: string[];
 
     if (typeof tags === 'string') {
-        // Parse space-separated tags (e.g., "#status/seedling #spiritualité")
-        tagArray = tags.split(/\s+/).filter((t) => t.startsWith('#'));
+        // Parse space-separated tags (e.g., "#status/seedling #spiritualité" or "status/seedling")
+        tagArray = tags
+            .split(/[\s,]+/) // Split by space or comma
+            .map((t) => t.trim())
+            .filter((t) => t.length > 0)
+            .map((t) => (t.startsWith('#') ? t.slice(1) : t)); // Remove # prefix
     } else if (Array.isArray(tags)) {
-        tagArray = tags.map((t) => String(t).trim());
+        tagArray = tags.map((t) => {
+            const str = String(t).trim();
+            return str.startsWith('#') ? str.slice(1) : str;
+        });
     } else {
         throw new ValidationError(
             `Invalid tags: expected string or array, got ${typeof tags}`

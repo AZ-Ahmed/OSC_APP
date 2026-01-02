@@ -18,4 +18,5 @@ export interface CaptureResponse {
     status: 'success' | 'error';
     obsidianFile?: string;
     message?: string;
+    markdown?: string;
 }

@@ -6,6 +6,7 @@ interface UseCaptureResult {
     isCapturing: boolean;
     error: string | null;
     lastCapture: CaptureResponse | null;
+    lastMarkdown?: string | null;
     submitCapture: (payload: CapturePayload) => Promise<boolean>;
     resetState: () => void;
 }
@@ -71,6 +72,7 @@ export const useCapture = (): UseCaptureResult => {
         isCapturing,
         error,
         lastCapture,
+        lastMarkdown: lastCapture?.markdown ?? null,
         submitCapture,
         resetState,
     };

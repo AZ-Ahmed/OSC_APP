@@ -7,8 +7,11 @@ const CapturePage: React.FC = () => {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const { submitCapture, isCapturing, error, resetState } = useCapture();
+    const { submitCapture, isCapturing, error, lastMarkdown } = useCapture();
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [showPreview, setShowPreview] = useState(true);
+    const [copySuccess, setCopySuccess] = useState(false);
+    const previewRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         return () => {
@@ -17,6 +20,26 @@ const CapturePage: React.FC = () => {
             }
         };
     }, [imagePreview]);
+
+    useEffect(() => {
+        if (lastMarkdown) {
+            setShowPreview(true);
+            setTimeout(() => {
+                previewRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+    }, [lastMarkdown]);
+
+    const handleCopy = async () => {
+        if (!lastMarkdown) return;
+        try {
+            await navigator.clipboard.writeText(lastMarkdown);
+            setCopySuccess(true);
+            setTimeout(() => setCopySuccess(false), 2000);
+        } catch (err) {
+            console.error('Failed to copy', err);
+        }
+    };
 
     const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -52,7 +75,7 @@ const CapturePage: React.FC = () => {
             setSuccessMessage('Saved to Obsidian');
             setTimeout(() => {
                 setSuccessMessage(null);
-                resetState();
+                // On ne reset PAS le state ici pour laisser la note affichée
             }, 3000);
         }
     };
@@ -116,6 +139,8 @@ const CapturePage: React.FC = () => {
                         onChange={(e) => setText(e.target.value)}
                         onKeyDown={handleKeyDown}
                         disabled={isCapturing}
+                        name="capture-text"
+                        id="capture-text"
                         autoFocus
                     />
 
@@ -156,6 +181,8 @@ const CapturePage: React.FC = () => {
                                 onChange={handleImageSelect}
                                 className="hidden"
                                 disabled={isCapturing}
+                                name="capture-image"
+                                id="capture-image"
                             />
                             <button
                                 onClick={() => fileInputRef.current?.click()}
@@ -202,6 +229,35 @@ const CapturePage: React.FC = () => {
                         </button>
                     </div>
                 </div>
+
+                {/* Markdown Preview */}
+                {lastMarkdown && (
+                    <div ref={previewRef} className="w-full bg-[#18181b] rounded-xl shadow-2xl border border-[#27272a] overflow-hidden animate-fade-in">
+                        <div className="flex justify-between items-center bg-[#131316] px-4 py-2 border-b border-[#27272a]">
+                            <h3 className="text-xs font-semibold tracking-widest text-[#71717a] uppercase select-none">Preview</h3>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShowPreview(!showPreview)}
+                                    className="text-xs text-[#52525b] hover:text-[#a1a1aa] transition-colors uppercase tracking-wider font-medium"
+                                >
+                                    {showPreview ? 'Hide' : 'Show'}
+                                </button>
+                                <button
+                                    onClick={handleCopy}
+                                    className={`text-xs uppercase tracking-wider font-medium transition-colors ${copySuccess ? 'text-green-500' : 'text-[#7c3aed] hover:text-[#8b5cf6]'
+                                        }`}
+                                >
+                                    {copySuccess ? 'Copied' : 'Copy'}
+                                </button>
+                            </div>
+                        </div>
+                        {showPreview && (
+                            <pre className="p-6 whitespace-pre-wrap font-mono text-sm text-[#d4d4d8] leading-relaxed opacity-90 overflow-x-auto">
+                                {lastMarkdown}
+                            </pre>
+                        )}
+                    </div>
+                )}
 
                 <div className="text-center">
                     <p className="text-[10px] uppercase tracking-widest text-[#3f3f46]">
