@@ -49,6 +49,7 @@ export const useCapture = (): UseCaptureResult => {
                     image: imageBase64,
                     projectPath: payload.projectPath,
                     timestamp: new Date().toISOString(),
+                    prompt: payload.prompt,
                 };
 
                 const response = await api.capture(request);

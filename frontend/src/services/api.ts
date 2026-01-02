@@ -22,6 +22,7 @@ export const api = {
                 text: request.text,
                 image: request.image ?? null,
                 projectPath: request.projectPath,
+                prompt: request.prompt,
             }),
         });
 

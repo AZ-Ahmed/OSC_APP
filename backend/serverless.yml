@@ -2,9 +2,15 @@ service: obsidian-smart-capture
 
 frameworkVersion: "4"
 
+package:
+  patterns:
+    - "!src/**/*.ts"
+    - "!tests/**"
+    - "src/core/prompts/*.md"
+
 provider:
   name: aws
-  runtime: nodejs20.x
+  runtime: nodejs22.x
   region: eu-west-3
   stage: dev
 
@@ -28,7 +34,7 @@ provider:
 
 functions:
   capture:
-    handler: src/handlers/capture.handler
+    handler: dist/handlers/capture.handler
     events:
       - httpApi:
           path: /capture

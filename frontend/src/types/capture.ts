@@ -4,6 +4,7 @@ export interface CapturePayload {
     text: string;
     image?: File | null;
     projectPath?: string;
+    prompt?: string;
 }
 
 export interface CaptureRequest {
@@ -11,6 +12,7 @@ export interface CaptureRequest {
     image?: string; // Base64 encoding
     projectPath?: string;
     timestamp: string;
+    prompt?: string;
 }
 
 export interface CaptureResponse {

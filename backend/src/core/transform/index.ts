@@ -113,7 +113,10 @@ export function generateFilename(title: string, date: Date): string {
     // Slugify the title
     const slug = slugify(title);
 
-    return `${dateStr}-${slug}.md`;
+    // Add unique suffix (5 random chars) to prevent collisions
+    const uniqueSuffix = Math.random().toString(36).substring(2, 7);
+
+    return `${dateStr}-${slug}-${uniqueSuffix}.md`;
 }
 
 /**

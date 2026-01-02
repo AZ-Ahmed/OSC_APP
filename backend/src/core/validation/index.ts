@@ -46,6 +46,7 @@ const THEMATIC_TAGS = [
     'cœur',
     'fiqh',
     'comportement',
+    'dhikr',
 ] as const;
 
 /**

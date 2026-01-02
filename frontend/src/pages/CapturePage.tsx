@@ -5,6 +5,7 @@ const CapturePage: React.FC = () => {
     const [text, setText] = useState('');
     const [image, setImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [promptMode, setPromptMode] = useState<string>('default');
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const { submitCapture, isCapturing, error, lastMarkdown } = useCapture();
@@ -12,6 +13,13 @@ const CapturePage: React.FC = () => {
     const [showPreview, setShowPreview] = useState(true);
     const [copySuccess, setCopySuccess] = useState(false);
     const previewRef = useRef<HTMLDivElement>(null);
+
+    const PROMPT_OPTIONS = [
+        { id: "default", label: "Default" },
+        { id: "livre", label: "Lecture (Livre)" },
+        { id: "hadith", label: "Hadith" },
+        { id: "action", label: "Action / Pratique" },
+    ];
 
     useEffect(() => {
         return () => {
@@ -66,7 +74,8 @@ const CapturePage: React.FC = () => {
         const success = await submitCapture({
             text,
             image,
-            projectPath: 'default'
+            projectPath: 'default',
+            prompt: promptMode,
         });
 
         if (success) {
@@ -95,10 +104,43 @@ const CapturePage: React.FC = () => {
             <main className="w-full max-w-[600px] flex-1 flex flex-col px-6 py-12 gap-6">
 
                 {/* Header */}
-                <header className="flex flex-col items-center justify-center pb-2 opacity-80">
-                    <h1 className="text-xs font-semibold tracking-[0.2em] text-[#a1a1aa] uppercase select-none">
+                <header className="flex flex-col items-center justify-center gap-3 pb-4">
+                    <h1 className="text-[10px] font-bold tracking-[0.2em] text-[#71717a] uppercase select-none">
                         Obsidian Smart Capture
                     </h1>
+
+                    {/* Prompt Selector */}
+                    <div className="relative group">
+                        <select
+                            value={promptMode}
+                            onChange={(e) => setPromptMode(e.target.value)}
+                            disabled={isCapturing}
+                            className="
+                                appearance-none 
+                                bg-[#18181b] 
+                                border border-[#27272a] 
+                                text-[#d4d4d8]
+                                text-xs font-medium 
+                                py-2 pl-4 pr-10 
+                                rounded-lg 
+                                shadow-sm
+                                focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]
+                                hover:border-[#3f3f46] hover:bg-[#27272a]
+                                transition-all cursor-pointer
+                            "
+                        >
+                            {PROMPT_OPTIONS.map((option) => (
+                                <option key={option.id} value={option.id} className="bg-[#18181b] text-[#d4d4d8]">
+                                    {option.label}
+                                </option>
+                            ))}
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[#71717a]">
+                            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                            </svg>
+                        </div>
+                    </div>
                 </header>
 
                 {/* Feedback Area */}
