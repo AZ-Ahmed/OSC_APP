@@ -6,13 +6,15 @@ package:
   patterns:
     - "!src/**/*.ts"
     - "!tests/**"
-    - "src/core/prompts/*.md"
+    - "!src/**/*.ts"
+    - "!tests/**"
 
 provider:
   name: aws
   runtime: nodejs22.x
   region: eu-west-3
   stage: dev
+  timeout: 29
 
   environment:
     OPENAI_API_KEY: ${env:OPENAI_API_KEY}

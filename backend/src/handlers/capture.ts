@@ -4,8 +4,7 @@ import { randomUUID } from "node:crypto";
 import { PROMPTS, type PromptKey } from "../core/prompts/index.js";
 import { validateMarkdown } from "../core/validation/index.js";
 import { commitFile } from "../adapters/github/client.js";
-import { normalizeMarkdown } from "../core/transform/normalizeMarkdown.js";
-import { extractTitle, generateFilename } from "../core/transform/index.js";
+import { transformCapture } from "../core/transform/index.js";
 
 const CORS_ORIGIN = process.env.CORS_ORIGIN || "";
 
@@ -45,6 +44,7 @@ export const handler = async (
         const body = JSON.parse(event.body);
 
         const text: string = body.text ?? "";
+        const image: string | undefined = body.image;
         const projectPath: string = body.projectPath;
         const promptKey = (body.prompt as PromptKey) || "default";
 
@@ -89,18 +89,26 @@ ${text || "(no text provided)"}
 `;
 
         /* ============================
-           OPENAI
+           OPENAI (Structured Output)
            ============================ */
 
-        const rawMarkdown = await complete({
+        // Returns JSON string guaranteed by Schema
+        const aiResponseJson = await complete({
             system: systemPrompt,
             user: userPrompt,
+            image, // Pass image for OCR analysis
         });
 
-        const markdown = normalizeMarkdown(rawMarkdown);
+        /* ============================
+           TRANSFORM (JSON -> Markdown)
+           ============================ */
+
+        const { markdown, filename } = transformCapture({
+            aiResponse: aiResponseJson
+        });
 
         /* ============================
-           VALIDATION
+           VALIDATION (Final Safety Check)
            ============================ */
 
         validateMarkdown(markdown);
@@ -108,9 +116,6 @@ ${text || "(no text provided)"}
         /* ============================
            GITHUB COMMIT
            ============================ */
-
-        const title = extractTitle(markdown);
-        const filename = generateFilename(title, new Date());
 
         try {
             await commitFile({

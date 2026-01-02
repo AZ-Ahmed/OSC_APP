@@ -51,3 +51,41 @@ npm run build
 - **Stateless** — No database, no session memory
 - **Deterministic** — Same input = same output
 - **Zero vendor lock-in** — Markdown + Git
+
+## 🛠 How to Add a New Prompt
+
+To add a new capture mode (e.g., `checklist`, `journal`):
+
+### 1. Create the Prompt File
+Create a new file in `backend/src/core/prompts/my-prompt.md`.
+**Important**: Do NOT include formatting rules (JSON, YAML). Focus only on content guidance.
+
+```markdown
+Tu es un expert en...
+
+TON OBJECTIF :
+Transformer la note brute en une checklist actionnable.
+
+STRUCTURE :
+1. Titre
+2. Liste de tâches
+```
+
+### 2. Register in Backend
+Edit `backend/src/core/prompts/index.ts`:
+
+```typescript
+export const PROMPTS = {
+    default: loadPrompt("default.md"),
+    // ...
+    checklist: loadPrompt("checklist.md"), // Add this
+} as const;
+```
+
+### 3. Update Frontend (Optional)
+If you want to select it in the UI, update `frontend/src/types/capture.ts`:
+
+```typescript
+export type PromptKey = 'default' | 'action' | 'checklist';
+```
+

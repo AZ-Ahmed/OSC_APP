@@ -1,33 +1,4 @@
-/**
- * ============================================================
- * CORE: TRANSFORM — PURE MARKDOWN GENERATION
- * ============================================================
- *
- * SINGLE RESPONSIBILITY:
- *   Transform raw capture → Valid Markdown string
- *
- * INPUT:
- *   - Raw text content
- *   - OCR result from image (if any)
- *   - AI-structured markdown from OpenAI
- *
- * OUTPUT:
- *   - string: 100% ready-to-commit Markdown
- *   - filename: Slugified filename for GitHub
- *
- * ✅ ALLOWED:
- *   - String manipulation
- *   - Pure function composition
- *
- * ❌ FORBIDDEN:
- *   - HTTP calls
- *   - GitHub operations
- *   - console.log / side effects
- *   - Adapter imports
- *   - Validation logic (handled elsewhere)
- *
- * ============================================================
- */
+import { NoteStructure } from "../schemas/note.js";
 
 export interface TransformInput {
     /** Raw text from user (optional context) */
@@ -36,12 +7,12 @@ export interface TransformInput {
     /** OCR-extracted text from image (optional context) */
     ocrText?: string;
 
-    /** AI-structured Markdown content from OpenAI */
+    /** JSON string from OpenAI Structured Output */
     aiResponse: string;
 }
 
 export interface TransformOutput {
-    /** Complete Markdown content (as-is from AI) */
+    /** Complete Markdown content */
     markdown: string;
 
     /** Generated filename (slug + date) */
@@ -49,52 +20,53 @@ export interface TransformOutput {
 }
 
 /**
- * Transform AI response into commit-ready Markdown
+ * Transform AI structured JSON into commit-ready Markdown
  *
  * Pure function: no side effects, deterministic output.
  *
- * @param input - Raw inputs and AI response
+ * @param input - Raw inputs and structured AI response (as JSON string)
  * @returns Markdown string ready for GitHub commit
- *
- * @example
- * const result = transformCapture({
- *   aiResponse: "---\ntype: concept\n---\n# La crainte d'Allah..."
- * });
- * // { markdown: "---\ntype: concept...", filename: "2026-01-01-la-crainte-dallah.md" }
  */
 export function transformCapture(input: TransformInput): TransformOutput {
     const { aiResponse } = input;
 
-    // Extract title from markdown (first H1 heading)
-    const title = extractTitle(aiResponse);
+    // Parse the Structured Output JSON
+    // Note: OpenAI guarantees this matches our schema, so we trust it matches NoteStructure
+    const data = JSON.parse(aiResponse) as NoteStructure;
+
+    // Combine status and thematic tags to meet validation requirements
+    const allTags = [
+        `status/${data.frontmatter.status}`,
+        ...data.frontmatter.tags
+    ];
+
+    // Construct Frontmatter
+    const frontmatter = `---
+type: ${data.frontmatter.type}
+source: "${data.frontmatter.source}"
+tags:
+${allTags.map(t => `  - ${t}`).join('\n')}
+---`;
+
+    // Construct Body from Sections
+    const body = data.sections
+        .map(section => {
+            // Sanitize heading to prevent markdown breakage (remove newlines)
+            const safeHeading = section.heading.replace(/\n/g, " ").trim();
+            return `## ${safeHeading}\n\n${section.content}`;
+        })
+        .join('\n\n');
+
+    // Assemble final Markdown
+    const markdown = `${frontmatter}\n\n# ${data.title}\n\n${body}`;
 
     // Generate filename from title and current date
-    const filename = generateFilename(title, new Date());
+    const filename = generateFilename(data.title, new Date());
 
     return {
-        markdown: aiResponse,
+        markdown,
         filename,
     };
-}
-
-/**
- * Extract the title from Markdown content
- *
- * Looks for the first H1 heading (# Title) in the content.
- * Falls back to "untitled" if no heading found.
- *
- * @param markdown - Raw markdown content
- * @returns Extracted title string
- */
-export function extractTitle(markdown: string): string {
-    // Match first H1 heading: # Title
-    const h1Match = markdown.match(/^#\s+(.+)$/m);
-
-    if (h1Match && h1Match[1]) {
-        return h1Match[1].trim();
-    }
-
-    return 'untitled';
 }
 
 /**
