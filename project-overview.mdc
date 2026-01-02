@@ -1,0 +1,30 @@
+# Obsidian Smart Capture (OSC)
+
+## Purpose
+OSC is a stateless AI-powered capture pipeline that transforms
+raw notes into Obsidian-native atomic Markdown files.
+
+## Philosophy
+Capture fast.
+Structure slow (via AI).
+Store nothing.
+
+## Architecture
+User (PWA)
+→ API Gateway
+→ AWS Lambda
+→ OpenAI GPT-4o
+→ GitHub Repo
+→ Obsidian Vault
+
+## Key Properties
+- Stateless
+- Deterministic output
+- Zero vendor lock-in (Markdown + Git)
+- PKM-first design (Zettelkasten, Atomic Notes)
+
+## AI Behavior
+- No memory
+- Strict system prompt
+- Tag whitelist
+- YAML guaranteed valid

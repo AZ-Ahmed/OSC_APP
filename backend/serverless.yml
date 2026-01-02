@@ -1,0 +1,35 @@
+service: obsidian-smart-capture
+
+frameworkVersion: "4"
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: eu-west-3
+  stage: dev
+
+  environment:
+    OPENAI_API_KEY: ${env:OPENAI_API_KEY}
+    GITHUB_TOKEN: ${env:GITHUB_TOKEN}
+    GITHUB_OWNER: ${env:GITHUB_OWNER}
+    GITHUB_REPO: ${env:GITHUB_REPO}
+    CORS_ORIGIN: https://osc.huda.fr
+
+  httpApi:
+    cors:
+      allowedOrigins:
+        - https://osc.huda.fr
+      allowedHeaders:
+        - Content-Type
+      allowedMethods:
+        - OPTIONS
+        - POST
+      maxAge: 86400
+
+functions:
+  capture:
+    handler: src/handlers/capture.handler
+    events:
+      - httpApi:
+          path: /capture
+          method: POST

@@ -1,0 +1,2 @@
+// Frontend TypeScript interfaces
+export { };

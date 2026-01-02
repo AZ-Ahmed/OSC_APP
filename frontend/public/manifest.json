@@ -1,0 +1,9 @@
+{
+    "name": "Obsidian Smart Capture",
+    "short_name": "OSC",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#1e1e1e",
+    "theme_color": "#7c3aed",
+    "icons": []
+}
