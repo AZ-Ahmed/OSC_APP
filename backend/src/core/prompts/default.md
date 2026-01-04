@@ -54,6 +54,7 @@ C. THÉMATIQUE (Max 2 par note) :
    - cœur (Maladies et remèdes du cœur)
    - fiqh (Règles pratiques)
    - comportement (Adab)
+   - shaitan
 
 ---
 

@@ -36,8 +36,8 @@ export function transformCapture(input: TransformInput): TransformOutput {
 
     // Combine status and thematic tags to meet validation requirements
     const allTags = [
-        `status/${data.frontmatter.status}`,
-        ...data.frontmatter.tags
+        `status/${data.frontmatter.status}`.toLowerCase(),
+        ...data.frontmatter.tags.map(t => t.toLowerCase())
     ];
 
     // Construct Frontmatter
